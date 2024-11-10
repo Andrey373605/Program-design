@@ -1,0 +1,409 @@
+  ADDR B1 B2 B3 B4 D:\KPROG\lab3\task_1_2_fix.asm                   PAGE       1
+
+                   .model tiny
+E                         ^ Unknown instruction or directive.
+                   .stack 100h
+E                         ^ Unexpected character in instruction or directive.
+                   .data
+                       size equ 7
+E                      ^ Unknown instruction or directive.
+                       str db '<number>'
+E                      ^ Unknown instruction or directive.
+                       enter_string db 'Enter a string:', 0Dh, 0Ah, '$'
+E                           ^ Unexpected character in instruction or directive.
+                       is_number db 1
+E                        ^ Unexpected character in instruction or directive.
+                       is_was_dot db 0
+E                        ^ Unexpected character in instruction or directive.
+                       number_before_dot db 0
+E                            ^ Unexpected character in instruction or directive.
+                       start_word dw 0
+E                           ^ Unexpected character in instruction or directive.
+                       count_word db 0
+E                           ^ Unexpected character in instruction or directive.
+                       buffer db 200, ?, 200 dup('$')
+E                      ^ Unknown instruction or directive.
+                   .code
+                   main:
+                       ; enter string
+                       mov ah, 09h
+E                      ^ Unknown instruction or directive.
+                       lea dx, enter_string
+E                      ^ Unknown instruction or directive.
+                       int 21h
+E                      ^ Unknown instruction or directive.
+
+                       mov ah, 0Ah
+E                      ^ Unknown instruction or directive.
+                       lea dx, buffer
+E                      ^ Unknown instruction or directive.
+                       int 21h
+E                      ^ Unknown instruction or directive.
+
+                       lea si, buffer + 2
+E                      ^ Unknown instruction or directive.
+                       mov start_word, si
+E                      ^ Unknown instruction or directive.
+
+                       lea ax, buffer
+E                      ^ Unknown instruction or directive.
+
+                   iterate:
+                       lodsb
+E                      ^ Unknown instruction or directive.
+                       cmp al, 0Dh
+E                      ^ Unknown instruction or directive.
+                       je end_iterate  ;exit
+E                      ^ Unknown instruction or directive.
+                       cmp al, ' '        ;space
+E                      ^ Unknown instruction or directive.
+                       jne start_of_word
+E                      ^ Unknown instruction or directive.
+  C000 7E C0 00        jmp iterate
+
+
+                   start_of_word:
+                       mov is_was_dot, 0
+E                      ^ Unknown instruction or directive.
+  ADDR B1 B2 B3 B4 D:\KPROG\lab3\task_1_2_fix.asm                   PAGE       2
+
+                       mov number_before_dot, 0          ;set si on begin of
+.                  string
+E                      ^ Unknown instruction or directive.
+                       mov is_number, 1
+E                      ^ Unknown instruction or directive.
+                       dec si
+E                          ^ Unknown identifier.
+                       mov start_word, si
+E                      ^ Unknown instruction or directive.
+                       lodsb
+E                      ^ Unknown instruction or directive.
+                       cmp al, '-'
+E                      ^ Unknown instruction or directive.
+                       je if_minus
+E                      ^ Unknown instruction or directive.
+                       dec si
+E                          ^ Unknown identifier.
+  C003 7E C0 0F        jmp iterate_in_word
+                   if_minus:
+                       cmp [si], ' '
+E                      ^ Unknown instruction or directive.
+                       je not_digit_word
+E                      ^ Unknown instruction or directive.
+                       cmp [si], 0Dh
+E                      ^ Unknown instruction or directive.
+                       je not_digit_word
+E                      ^ Unknown instruction or directive.
+                       mov number_before_dot, 0
+E                      ^ Unknown instruction or directive.
+  C006 7E C0 0F        jmp iterate_in_word
+
+                   iterate_in_word:
+                       lodsb
+E                      ^ Unknown instruction or directive.
+                       cmp al, ' '
+E                      ^ Unknown instruction or directive.
+                       je end_of_word
+E                      ^ Unknown instruction or directive.
+                       cmp al, '.'
+E                      ^ Unknown instruction or directive.
+                       je dot
+E                      ^ Unknown instruction or directive.
+                       cmp al, 0Dh
+E                      ^ Unknown instruction or directive.
+                       je end_of_string
+E                      ^ Unknown instruction or directive.
+                       cmp al, '0'         ;number check
+E                      ^ Unknown instruction or directive.
+                       jb not_digit_word
+E                      ^ Unknown instruction or directive.
+                       cmp al, '9'
+E                      ^ Unknown instruction or directive.
+                       ja not_digit_word
+E                      ^ Unknown instruction or directive.
+                       mov number_before_dot, 1
+E                      ^ Unknown instruction or directive.
+  C009 7E C0 09        jmp iterate_in_word
+
+                   dot:
+                       add is_was_dot, 1
+E                      ^ Unknown instruction or directive.
+                       cmp is_was_dot, 1
+E                      ^ Unknown instruction or directive.
+                       jne set_not_correct
+E                      ^ Unknown instruction or directive.
+  ADDR B1 B2 B3 B4 D:\KPROG\lab3\task_1_2_fix.asm                   PAGE       3
+
+                       cmp number_before_dot, 0
+E                      ^ Unknown instruction or directive.
+                       je set_not_correct
+E                      ^ Unknown instruction or directive.
+  C00C 7E C0 09        jmp iterate_in_word
+                   set_not_correct:
+                       mov is_number, 0
+E                      ^ Unknown instruction or directive.
+  C00F 7E C0 09        jmp iterate_in_word
+
+                   not_digit_word:               ;set is_number false
+E                                                ^ Unexpected character in
+.                                                  instruction or directive.
+                       mov is_number, 0
+E                      ^ Unknown instruction or directive.
+  C012 7E C0 09        jmp iterate_in_word
+
+                   end_of_word:                ;to the next word
+E                                              ^ Unexpected character in
+.                                                instruction or directive.
+                       cmp is_number, 0
+E                      ^ Unknown instruction or directive.
+                       je iterate
+E                      ^ Unknown instruction or directive.
+                       mov si, start_word
+E                      ^ Unknown instruction or directive.
+                       jmp replace_digits
+E                          ^ Unknown identifier.
+
+                   end_of_string:              ;end check string
+E                                              ^ Unexpected character in
+.                                                instruction or directive.
+                       cmp is_number, 0
+E                      ^ Unknown instruction or directive.
+                       je end_iterate
+E                      ^ Unknown instruction or directive.
+                       mov si, start_word
+E                      ^ Unknown instruction or directive.
+                       jmp replace_digits_end
+E                          ^ Unknown identifier.
+
+                   replace_digits_end:         ;replace last number
+E                                              ^ Unexpected character in
+.                                                instruction or directive.
+                       lodsb
+E                      ^ Unknown instruction or directive.
+                       cmp al, 0Dh
+E                      ^ Unknown instruction or directive.
+                       je end_iterate
+E                      ^ Unknown instruction or directive.
+                       mov byte ptr [si-1], 1
+E                      ^ Unknown instruction or directive.
+                       jmp replace_digits_end
+E                          ^ Unknown identifier.
+
+                   replace_digits:             ;replace numbers
+E                                              ^ Unexpected character in
+.                                                instruction or directive.
+                       lodsb
+E                      ^ Unknown instruction or directive.
+                       cmp al, ' '
+E                      ^ Unknown instruction or directive.
+                       je iterate
+E                      ^ Unknown instruction or directive.
+                       mov byte ptr [si-1], 1
+  ADDR B1 B2 B3 B4 D:\KPROG\lab3\task_1_2_fix.asm                   PAGE       4
+
+E                      ^ Unknown instruction or directive.
+                       jmp replace_digits
+E                          ^ Unknown identifier.
+
+                   end_iterate:
+
+                       lea si, buffer + 2
+E                      ^ Unknown instruction or directive.
+
+                   iterate_del:             ;delete same symbols
+E                                           ^ Unexpected character in
+.                                             instruction or directive.
+                       lodsb
+E                      ^ Unknown instruction or directive.
+                       cmp al, 0Dh
+E                      ^ Unknown instruction or directive.
+                       je end_del
+E                      ^ Unknown instruction or directive.
+                       cmp [si], 1
+E                      ^ Unknown instruction or directive.
+                       jne iterate_del
+E                      ^ Unknown instruction or directive.
+                       cmp al, 1
+E                      ^ Unknown instruction or directive.
+                       jne iterate_del
+E                      ^ Unknown instruction or directive.
+                       dec si
+E                          ^ Unknown identifier.
+                       mov bx, 0
+E                      ^ Unknown instruction or directive.
+  C015 7E C0 2D        jmp del
+
+                   del:
+                       cmp [si+bx], 0Dh
+E                      ^ Unknown instruction or directive.
+                       je iterate_del
+E                      ^ Unknown instruction or directive.
+
+                       mov al, [si+bx+1]
+E                      ^ Unknown instruction or directive.
+                       mov [si+bx], al
+E                      ^ Unknown instruction or directive.
+
+                       inc bx
+E                          ^ Unknown identifier.
+  C018 7E C0 18        jmp del
+
+                   end_del:
+
+                       lea si, buffer + 2
+E                      ^ Unknown instruction or directive.
+                   get_count:                    ;get count of numbers in string
+E                                                ^ Unexpected character in
+.                                                  instruction or directive.
+                       lodsb
+E                      ^ Unknown instruction or directive.
+                       cmp al, 0Dh
+E                      ^ Unknown instruction or directive.
+                       je replace
+E                      ^ Unknown instruction or directive.
+                       cmp al, 1
+E                      ^ Unknown instruction or directive.
+                       jne skip_char
+E                      ^ Unknown instruction or directive.
+                       inc count_word
+  ADDR B1 B2 B3 B4 D:\KPROG\lab3\task_1_2_fix.asm                   PAGE       5
+
+E                          ^ Unknown identifier.
+                   skip_char:
+                       jmp get_count
+E                          ^ Unknown identifier.
+
+                   replace:
+                       cmp count_word, 0
+E                      ^ Unknown instruction or directive.
+                       je print_string                 ;algorithm insert <
+.                  number>
+E                      ^ Unknown instruction or directive.
+                       dec count_word
+E                          ^ Unknown identifier.
+                       lea si, buffer+2
+E                      ^ Unknown instruction or directive.
+  C01B 7E C0 3F        jmp find_end
+
+                   find_end:
+                       lodsb
+E                      ^ Unknown instruction or directive.
+                       cmp al, 0Dh
+E                      ^ Unknown instruction or directive.
+                       jne find_end
+E                      ^ Unknown instruction or directive.
+                       dec si
+E                          ^ Unknown identifier.
+
+                       mov bx, 0
+E                      ^ Unknown instruction or directive.
+                       lea di, si+size
+E                      ^ Unknown instruction or directive.
+                       jmp iterate_insert
+E                          ^ Unknown identifier.
+
+                   insert:                       ; insert <number>
+E                                                ^ Unexpected character in
+.                                                  instruction or directive.
+                       lea di, si-bx
+E                      ^ Unknown instruction or directive.
+                       lea si, str
+E                      ^ Unknown instruction or directive.
+                       mov cx, size+1
+E                      ^ Unknown instruction or directive.
+                       rep movsb
+E                      ^ Unknown instruction or directive.
+                       cmp count_word, 0
+E                      ^ Unknown instruction or directive.
+                       je print_string
+E                      ^ Unknown instruction or directive.
+  C01E 7E C0 1B        jmp replace
+
+                   iterate_insert:              ;increasing the insertion space
+E                                               ^ Unexpected character in
+.                                                 instruction or directive.
+                       lea ax, buffer
+E                      ^ Unknown instruction or directive.
+                       add ax, 2
+E                      ^ Unknown instruction or directive.
+                       cmp ax, si+bx
+E                      ^ Unknown instruction or directive.
+                       ja print_string
+E                      ^ Unknown instruction or directive.
+                       cmp [si+bx], 1
+E                      ^ Unknown instruction or directive.
+                       je insert
+  ADDR B1 B2 B3 B4 D:\KPROG\lab3\task_1_2_fix.asm                   PAGE       6
+
+E                      ^ Unknown instruction or directive.
+
+                       mov ax, [si+bx]
+E                      ^ Unknown instruction or directive.
+                       mov [di+bx], ax
+E                      ^ Unknown instruction or directive.
+                       dec bx
+E                          ^ Unknown identifier.
+                       jmp iterate_insert
+E                          ^ Unknown identifier.
+
+
+                   print_string:
+                       mov ah, 02h
+E                      ^ Unknown instruction or directive.
+                       mov dl, 0Dh
+E                      ^ Unknown instruction or directive.
+                       int 21h
+E                      ^ Unknown instruction or directive.
+
+                       mov dl, 0Ah
+E                      ^ Unknown instruction or directive.
+                       int 21h
+E                      ^ Unknown instruction or directive.
+                                          ;print string
+                       lea si, buffer+2
+E                      ^ Unknown instruction or directive.
+
+                   print_char:
+                       lodsb
+E                      ^ Unknown instruction or directive.
+                       cmp al, 0Dh
+E                      ^ Unknown instruction or directive.
+                       je end_program
+E                      ^ Unknown instruction or directive.
+
+                       mov ah, 0Eh
+E                      ^ Unknown instruction or directive.
+                       int 10h
+E                      ^ Unknown instruction or directive.
+  C021 7E C0 21        jmp print_char
+
+                   end_program:
+                       mov ah, 4Ch
+E                      ^ Unknown instruction or directive.
+                       int 21h
+E                      ^ Unknown instruction or directive.
+                   end main
+E                      ^ Unknown instruction or directive.
+
+  Symbol Table 
+
+  START_OF_WORD      C003
+  FIND_END           C01E
+  ITERATE_IN_WORD    C009
+  ITERATE            C000
+  IF_MINUS           C006
+  END_DEL            C01B
+  .DATA              C000
+  PRINT_CHAR         C021
+  MAIN               C000
+  DOT                C00C
+  SKIP_CHAR          C01B
+  END_ITERATE        C015
+  SET_NOT_CORRECT    C00F
+  Symbol Table     D:\KPROG\lab3\task_1_2_fix.asm                   PAGE       7
+
+  .CODE              C000
+  PRINT_STRING       C021
+  REPLACE            C01B
+  DEL                C018
+  END_PROGRAM        C024
