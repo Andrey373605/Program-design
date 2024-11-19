@@ -162,13 +162,13 @@ CloseFile proc
     ret
 endp CloseFile
 ;------------------------
-CommandLine proc   ;iz psp bloca zanosim parametri comandnoi stroci v buffer 
+CommandLine proc
     xor cx, cx
     xor di, di
     mov si, 80h  
     
 commandLineInput:
-    mov al, es:[si] ;dlinna cpmandnoi stroci
+    mov al, es:[si] 
     inc si
     
     cmp al, 0                 
@@ -184,8 +184,8 @@ commandLineEnd:
 endp CommandLine
 ;-------------------------
 StartAnotherProgram proc
-    mov ax, 4a00h ;izmenit razmer bloca pamiaty
-    mov bx, ((csize/16) + 17) + ((dsize/16) + 17) + 1 ;novii razmer
+    mov ax, 4a00h 
+    mov bx, ((csize/16) + 17) + ((dsize/16) + 17) + 1
     int 21h
     
     Cout msg1
@@ -199,9 +199,9 @@ StartAnotherProgram proc
     mov es, ax
     
     
-    mov ax, 4B00h ;zagruzka i vipolnenie programi
+    mov ax, 4B00h
     lea dx, program 
-    lea bx, EPB ;adress bloca parametrov
+    lea bx, EPB
     int 21h
     jb ErrorStartProgram
 
