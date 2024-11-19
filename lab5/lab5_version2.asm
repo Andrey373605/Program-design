@@ -155,8 +155,6 @@ read_file_name:
     mov  al, es:[si]
     cmp  al, 0Dh
     je   end_file_name
-    cmp  al, "$"
-    je   end_file_name
     mov  [di], al
     inc  di
     inc  si
