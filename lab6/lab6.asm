@@ -3,7 +3,7 @@
 .data 
     msg1 db 13, 10, "Trying execute program 'test.exe'.$"
     msg2 db 13, 10, "Program start error.$" 
-    msg3 db 13, 10, "First program has been close. Press any key.$"
+    msg3 db 13, 10, "First program has been close.$"
     
     program db "TEST.exe", 0
     fileParameters db 128 dup("$")
@@ -52,7 +52,7 @@ ForCheck:
     cmp buffer[si], 20h ;spase
     je Next
     
-    cmp buffer[si], 09h
+    cmp buffer[si], 09h ;tab
     je Next
     
     cmp buffer[si], 24h ;$
@@ -199,7 +199,7 @@ StartAnotherProgram proc
     mov es, ax
     
     
-    mov ax, 4B00h
+    mov ax, 4b00h
     lea dx, program 
     lea bx, EPB
     int 21h
