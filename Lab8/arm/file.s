@@ -6,7 +6,7 @@ main:
     print enterNameMesage 16
     mov x0, #0 
     ldr x1, =filename1 
-    mov x2, #256
+    mov x2, #2048
     mov x8, #63
     svc 0
 
@@ -52,7 +52,7 @@ end_replace2:
     MOV X11, X0
     CMP X0, 0         
 
-    openFile filename2, S_RDWR
+    openFile filename2, O_CREAT
     MOV X12, X0
     CMP X0, 0         
   
@@ -89,10 +89,10 @@ no_error:
     print errMessage 21    
     B finish              
 read: 
-    readFile X11, output, 255   
+    readFile X11, output, 2048   
     close X11
     close X12                
-    print output 255           
+    print output 2048           
  
 finish:    
     exit 0        
@@ -101,7 +101,7 @@ finish:
     errMessage: .asciz "Fail\n" 
     successMesage: .asciz "Copy success\n"
     enterNameMesage: .asciz "Enter file name:\n"   
-    output: .fill 256, 1, 0
+    output: .fill 2048, 1, 0
 .bss
     filename1: .skip 256
     filename2: .skip 256
